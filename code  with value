@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор гарантии CarSave</title>
+    <style>
+        /* Добавляем стиль для изоляции калькулятора */
+        #carsave-calculator-wrapper {
+            --primary-blue: #1B56EB;
+            --primary-light: #F3F7FE;
+            --accent-green: #00D4AA;
+            --text-dark: #1A1A2C;
+            --text-gray: #6A6A8A;
+            --light-bg: #F5F7FA;
+            --white: #FFFFFF;
+            --border-radius: 23px;
+            --border-radius-sm: 23px;
+            --shadow: 0 4px 20px rgba(27, 86, 235, 0.08);
+            --transition: all 0.3s ease;
+        }
+        
+        #carsave-calculator-wrapper * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Nunito', sans-serif;
+        }
+        
+        #carsave-calculator-wrapper {
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+            line-height: 1.5;
+            font-weight: 400;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 100px 20px 20px;
+        }
+        
+        #carsave-calculator-wrapper .calculator {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            background: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 40px;
+            max-width: 1200px;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        #carsave-calculator-wrapper .left-column, 
+        #carsave-calculator-wrapper .right-column {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        #carsave-calculator-wrapper .left-column h2, 
+        #carsave-calculator-wrapper .right-column h2 {
+            margin-bottom: 25px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+        
+        /* Стили для формы ввода */
+        #carsave-calculator-wrapper .input-group {
+            margin-bottom: 20px;
+        }
+        
+        #carsave-calculator-wrapper .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 1rem;
+        }
+        
+        #carsave-calculator-wrapper .input-group input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 1px solid #E6E6F0;
+            border-radius: var(--border-radius-sm);
+            font-size: 1rem;
+            transition: var(--transition);
+            background-color: var(--white);
+        }
+        
+        #carsave-calculator-wrapper .input-group input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(27, 86, 235, 0.1);
+        }
+        
+        /* Стили для тарифов */
+        #carsave-calculator-wrapper .tariff-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 10px;
+        }
+        
+        #carsave-calculator-wrapper .tariff-item {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            border-radius: var(--border-radius-sm);
+            transition: var(--transition);
+            border: 1px solid #E6E6F0;
+            cursor: pointer;
+        }
+        
+        #carsave-calculator-wrapper .tariff-item:hover {
+            border-color: var(--primary-blue);
+        }
+        
+        #carsave-calculator-wrapper .tariff-item.selected {
+            border-color: var(--primary-blue);
+            background-color: var(--primary-light);
+        }
+        
+        /* Кастомные радиокнопки */
+        #carsave-calculator-wrapper .custom-radio {
+            position: relative;
+            width: 20px;
+            height: 20px;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        #carsave-calculator-wrapper .custom-radio input {
+            opacity: 0;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        #carsave-calculator-wrapper .radio-icon {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #D1D1E0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+        
+        #carsave-calculator-wrapper .radio-icon:after {
+            content: "";
+            width: 8px;
+            height: 8px;
+            background: var(--white);
+            border-radius: 50%;
+            opacity: 0;
+            transition: var(--transition);
+        }
+        
+        #carsave-calculator-wrapper .custom-radio input:checked + .radio-icon {
+            background-color: var(--primary-blue);
+            border-color: var(--primary-blue);
+        }
+        
+        #carsave-calculator-wrapper .custom-radio input:checked + .radio-icon:after {
+            opacity: 1;
+        }
+        
+        #carsave-calculator-wrapper .tariff-info {
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        #carsave-calculator-wrapper .tariff-name {
+            font-weight: 500;
+            font-size: 1rem;
+            color: var(--text-dark);
+        }
+        
+        #carsave-calculator-wrapper .tariff-coverage {
+            color: var(--primary-blue);
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        /* Кнопка расчета */
+        #carsave-calculator-wrapper .calculate-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary-blue);
+            color: var(--white);
+            border: none;
+            border-radius: var(--border-radius-sm);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 10px;
+        }
+        
+        #carsave-calculator-wrapper .calculate-btn:hover {
+            background: #1549c7;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(27, 86, 235, 0.15);
+        }
+        
+        /* Стили для правой колонки с результатами */
+        #carsave-calculator-wrapper .results {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        #carsave-calculator-wrapper .result-block {
+            background: var(--light-bg);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            text-align: center;
+            transition: var(--transition);
+        }
+        
+        #carsave-calculator-wrapper .guarantee-cost {
+            background: var(--primary-blue);
+            color: var(--white);
+        }
+        
+        #carsave-calculator-wrapper .result-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            transition: var(--transition);
+        }
+        
+        #carsave-calculator-wrapper .guarantee-cost .result-value {
+            color: var(--white);
+        }
+        
+        #carsave-calculator-wrapper .result-label {
+            color: var(--text-gray);
+            font-size: 0.95rem;
+            font-weight: 400;
+        }
+        
+        #carsave-calculator-wrapper .guarantee-cost .result-label {
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        #carsave-calculator-wrapper .guarantee-note {
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 400;
+            line-height: 1.4;
+        }
+        
+        /* Усиленные стили для кнопки-ссылки с белым текстом */
+        #carsave-calculator-wrapper .calculator .contact-btn,
+        #carsave-calculator-wrapper .calculator a.contact-btn,
+        #carsave-calculator-wrapper .contact-btn {
+            display: inline-block !important;
+            width: 100% !important;
+            padding: 16px !important;
+            background: var(--primary-blue) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: var(--border-radius-sm) !important;
+            cursor: pointer !important;
+            transition: var(--transition) !important;
+            font-family: 'Nunito', sans-serif !important;
+            text-decoration: none !important;
+            font-weight: 600 !important;
+            text-align: center !important;
+            margin-top: 15px !important;
+        }
+        
+        #carsave-calculator-wrapper .calculator .contact-btn:hover,
+        #carsave-calculator-wrapper .calculator a.contact-btn:hover,
+        #carsave-calculator-wrapper .contact-btn:hover {
+            background: #1549c7 !important;
+            color: white !important;
+            text-decoration: none !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 12px rgba(27, 86, 235, 0.15) !important;
+        }
+        
+        #carsave-calculator-wrapper .right-column-note {
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: var(--text-gray);
+            font-weight: 400;
+            text-align: center;
+            line-height: 1.4;
+            padding: 0 10px;
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            #carsave-calculator-wrapper {
+                padding: 80px 10px 10px;
+                align-items: flex-start;
+                font-size: 0.7rem;
+            }
+            
+            #carsave-calculator-wrapper .calculator {
+                flex-direction: column;
+                padding: 20px;
+                gap: 20px;
+                border-radius: 16px;
+                margin-top: 10px;
+            }
+            
+            #carsave-calculator-wrapper .left-column, 
+            #carsave-calculator-wrapper .right-column {
+                min-width: unset;
+                width: 100%;
+            }
+            
+            #carsave-calculator-wrapper .left-column h2, 
+            #carsave-calculator-wrapper .right-column h2 {
+                font-size: 1.05rem;
+                margin-bottom: 15px;
+            }
+            
+            #carsave-calculator-wrapper .input-group {
+                margin-bottom: 15px;
+            }
+            
+            #carsave-calculator-wrapper .input-group label {
+                font-size: 0.7rem;
+            }
+            
+            #carsave-calculator-wrapper .input-group input {
+                padding: 12px 15px;
+                border-radius: 16px;
+                font-size: 0.7rem;
+            }
+            
+            #carsave-calculator-wrapper .tariff-options {
+                gap: 8px;
+            }
+            
+            #carsave-calculator-wrapper .tariff-item {
+                padding: 12px 15px;
+                border-radius: 16px;
+            }
+            
+            #carsave-calculator-wrapper .tariff-name, 
+            #carsave-calculator-wrapper .tariff-coverage {
+                font-size: 0.7rem;
+            }
+            
+            #carsave-calculator-wrapper .custom-radio {
+                width: 16px;
+                height: 16px;
+                margin-right: 12px;
+            }
+            
+            #carsave-calculator-wrapper .radio-icon {
+                width: 16px;
+                height: 16px;
+            }
+            
+            #carsave-calculator-wrapper .radio-icon:after {
+                width: 6px;
+                height: 6px;
+            }
+            
+            #carsave-calculator-wrapper .calculate-btn {
+                padding: 12px;
+                border-radius: 16px;
+                font-size: 0.7rem;
+            }
+            
+            #carsave-calculator-wrapper .results {
+                gap: 15px;
+            }
+            
+            #carsave-calculator-wrapper .result-block {
+                padding: 20px;
+                border-radius: 16px;
+            }
+            
+            #carsave-calculator-wrapper .result-value {
+                font-size: 1.26rem;
+            }
+            
+            #carsave-calculator-wrapper .result-label {
+                font-size: 0.665rem;
+            }
+            
+            #carsave-calculator-wrapper .guarantee-note {
+                font-size: 0.595rem;
+            }
+            
+            /* Адаптивные стили для кнопки-ссылки */
+            #carsave-calculator-wrapper .calculator .contact-btn,
+            #carsave-calculator-wrapper .calculator a.contact-btn,
+            #carsave-calculator-wrapper .contact-btn {
+                padding: 12px !important;
+                border-radius: 16px !important;
+                font-size: 0.7rem !important;
+            }
+            
+            #carsave-calculator-wrapper .right-column-note {
+                font-size: 0.595rem;
+                margin-top: 15px;
+            }
+        }
+        
+        /* Для очень маленьких экранов */
+        @media (max-width: 480px) {
+            #carsave-calculator-wrapper {
+                padding: 60px 10px 10px;
+            }
+            
+            #carsave-calculator-wrapper .calculator {
+                padding: 15px;
+                gap: 15px;
+            }
+            
+            #carsave-calculator-wrapper .input-group input {
+                padding: 10px 12px;
+            }
+            
+            #carsave-calculator-wrapper .tariff-item {
+                padding: 10px 12px;
+            }
+            
+            #carsave-calculator-wrapper .result-block {
+                padding: 15px;
+            }
+            
+            #carsave-calculator-wrapper .result-value {
+                font-size: 1.1rem;
+            }
+        }
+        
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Обертка для изоляции стилей калькулятора -->
+    <div id="carsave-calculator-wrapper">
+        <!-- Блок калькулятора -->
+        <section class="calculator">
+            <!-- Левая колонка: Форма ввода -->
+            <div class="left-column">
+                <h2>Рассчитайте стоимость гарантии</h2>
+                
+                <div class="input-group">
+                    <label for="carModel">Модель автомобиля:</label>
+                    <input type="text" id="carModel" placeholder="Например, Toyota Camry">
+                </div>
+                
+                <div class="input-group">
+                    <label for="carYear">Год выпуска:</label>
+                    <input type="number" id="carYear" min="1990" max="2024" placeholder="2020">
+                </div>
+                
+                <div class="input-group">
+                    <label for="carMileage">Пробег (км):</label>
+                    <input type="number" id="carMileage" placeholder="50000">
+                </div>
+                
+                <div class="input-group">
+                    <label for="carPrice">Примерная рыночная стоимость автомобиля (₽):</label>
+                    <input type="number" id="carPrice" placeholder="2000000">
+                </div>
+                
+                <div class="input-group">
+                    <label>Тариф гарантии:</label>
+                    <div class="tariff-options">
+                        <div class="tariff-item" data-value="1" data-coverage="0.08">
+                            <div class="custom-radio">
+                                <input type="radio" id="tariff1" name="tariff" value="1" checked>
+                                <div class="radio-icon"></div>
+                            </div>
+                            <div class="tariff-info">
+                                <span class="tariff-name">СТАРТ</span>
+                                <span class="tariff-coverage">Покрытие: 8% от стоимости авто</span>
+                            </div>
+                        </div>
+                        
+                        <div class="tariff-item" data-value="1.5" data-coverage="0.15">
+                            <div class="custom-radio">
+                                <input type="radio" id="tariff2" name="tariff" value="1.5">
+                                <div class="radio-icon"></div>
+                            </div>
+                            <div class="tariff-info">
+                                <span class="tariff-name">КОМФОРТ</span>
+                                <span class="tariff-coverage">Покрытие: 15% от стоимости авто</span>
+                            </div>
+                        </div>
+                        
+                        <div class="tariff-item" data-value="2" data-coverage="0.30">
+                            <div class="custom-radio">
+                                <input type="radio" id="tariff3" name="tariff" value="2">
+                                <div class="radio-icon"></div>
+                            </div>
+                            <div class="tariff-info">
+                                <span class="tariff-name">ПРЕМИУМ</span>
+                                <span class="tariff-coverage">Покрытие: 30% от стоимости авто</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="calculate-btn" id="calculateBtn">Рассчитать стоимость</button>
+            </div>
+            
+            <!-- Правая колонка: Итоги и гарантия -->
+            <div class="right-column">
+                <h2>Ваша выгода:</h2>
+                <div class="results">
+                    <div class="result-block guarantee-cost">
+                        <div class="result-value" id="calculatedPrice">0 ₽</div>
+                        <div class="result-label">Стоимость годовой гарантии</div>
+                        <div class="result-label" id="coverageAmount">Сумма покрытия: 0 ₽</div>
+                        <p class="guarantee-note">
+                            В стоимость гарантии входит ремонт, эвакуация и контроль качества
+                        </p>
+                    </div>
+                </div>
+                
+                <a href="https://t.me/+79691009118" target="_blank" class="contact-btn">Связаться с менеджером</a>
+                
+                <p class="right-column-note">
+                    Точную стоимость рассчитает менеджер после осмотра автомобиля
+                </p>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const calculateBtn = document.getElementById('calculateBtn');
+            const calculatedPrice = document.getElementById('calculatedPrice');
+            const coverageAmount = document.getElementById('coverageAmount');
+            
+            // Обработчики для выбора тарифа
+            document.querySelectorAll('#carsave-calculator-wrapper .tariff-item').forEach(item => {
+                const radio = item.querySelector('input[type="radio"]');
+                
+                // Обработчик клика по всей строке тарифа
+                item.addEventListener('click', function(e) {
+                    if (e.target.tagName !== 'INPUT') {
+                        radio.checked = true;
+                        // Создаем событие change для радио-кнопки
+                        const event = new Event('change');
+                        radio.dispatchEvent(event);
+                    }
+                });
+                
+                // Обработчик изменения радио-кнопки
+                radio.addEventListener('change', function() {
+                    // Обновляем визуальное состояние всех тарифов
+                    document.querySelectorAll('#carsave-calculator-wrapper .tariff-item').forEach(tariff => {
+                        tariff.classList.remove('selected');
+                    });
+                    
+                    // Выделяем выбранный тариф
+                    item.classList.add('selected');
+                });
+            });
+            
+            // Инициализация выбранного тарифа
+            document.querySelector('#carsave-calculator-wrapper .tariff-item input:checked').dispatchEvent(new Event('change'));
+            
+            function calculatePrice() {
+                const year = parseInt(document.getElementById('carYear').value) || 2020;
+                const mileage = parseInt(document.getElementById('carMileage').value) || 50000;
+                const carPrice = parseInt(document.getElementById('carPrice').value) || 2000000;
+                const selectedTariff = parseFloat(document.querySelector('#carsave-calculator-wrapper input[name="tariff"]:checked').value);
+                const selectedTariffCoverage = parseFloat(document.querySelector('#carsave-calculator-wrapper .tariff-item.selected').dataset.coverage);
+                
+                // Базовая ставка в зависимости от стоимости автомобиля
+                let baseRate;
+                
+                if (carPrice <= 5000000) {
+                    baseRate = 0.01; // 1%
+                } else if (carPrice <= 10000000) {
+                    baseRate = 0.013; // 1.3%
+                } else if (carPrice <= 20000000) {
+                    baseRate = 0.011; // 1.1%
+                } else {
+                    baseRate = 0.012; // 1.2%
+                }
+                
+                // Базовая цена = стоимость авто * базовая ставка
+                let basePrice = carPrice * baseRate;
+                
+                // Коэффициент возраста
+                const currentYear = new Date().getFullYear();
+                const carAge = currentYear - year;
+                let ageCoefficient = 1;
+                
+                if (carAge <= 3) {
+                    ageCoefficient = 1;
+                } else if (carAge <= 7) {
+                    ageCoefficient = 1.1;
+                } else {
+                    ageCoefficient = 1.2;
+                }
+                
+                // Коэффициент пробега
+                let mileageCoefficient = 1;
+                
+                if (mileage <= 50000) {
+                    mileageCoefficient = 1;
+                } else if (mileage <= 100000) {
+                    mileageCoefficient = 1.1;
+                } else {
+                    mileageCoefficient = 1.2;
+                }
+                
+                // Итоговая цена гарантии
+                const finalPrice = Math.round(basePrice * ageCoefficient * mileageCoefficient * selectedTariff);
+                
+                // Сумма покрытия
+                const coverageValue = Math.round(carPrice * selectedTariffCoverage);
+                
+                return {
+                    price: finalPrice,
+                    coverage: coverageValue
+                };
+            }
+
+            calculateBtn.addEventListener('click', function() {
+                const result = calculatePrice();
+                calculatedPrice.textContent = result.price.toLocaleString('ru-RU') + ' ₽';
+                coverageAmount.textContent = 'Сумма покрытия: ' + result.coverage.toLocaleString('ru-RU') + ' ₽';
+            });
+        });
+    </script>
+</body>
+</html>
